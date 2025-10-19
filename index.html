@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mental Health Chatbot - Your Daily Wellness Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCT-6pf9VqWh9IdHasEK8YgSdkzmOEE9GE",
+            authDomain: "mental-health-chatbot-95bd1.firebaseapp.com",
+            projectId: "mental-health-chatbot-95bd1",
+            storageBucket: "mental-health-chatbot-95bd1.firebasestorage.app",
+            messagingSenderId: "249843773945",
+            appId: "1:249843773945:web:ff9fb202b4c8fcc9e7cd28",
+            measurementId: "G-22QH56YYXZ"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAnalytics = analytics;
+    </script>
+    
+</head>
+<body>
+    <div class="app-container">
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-heart"></i>
+                    <span>MindWell Assistant</span>
+                </div>
+                <button class="mobile-close-btn" id="mobile-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active" data-section="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>Local Chat</span>
+                </li>
+                <li class="nav-item" data-section="mood">
+                    <i class="fas fa-smile"></i>
+                    <span>Mood Tracker</span>
+                </li>
+                <li class="nav-item" data-section="checkin">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Daily Check-in</span>
+                </li>
+                <li class="nav-item" data-section="resources">
+                    <i class="fas fa-book"></i>
+                    <span>Resources</span>
+                </li>
+                <li class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="language-switcher">
+                    <label for="language-select">Language:</label>
+                    <select id="language-select" class="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    </select>
+                </div>
+                <div class="user-info">
+                    <div class="streak-counter">
+                        <i class="fas fa-fire"></i>
+                        <span id="streak-count">0</span> day streak
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Local Chat Section -->
+            <section id="chat-section" class="content-section active">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h2>Local Wellness Chat</h2>
+                        <p>Simple pattern-matching mental health support</p>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm your local mental health companion. How are you feeling today? I'm here to listen and provide support whenever you need it.</p>
+                                <span class="message-time">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Type your message here..." autocomplete="off">
+                            <button id="send-button" class="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="typing-indicator" id="typing-indicator">
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span>Assistant is typing...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Mood Tracker Section -->
+            <section id="mood-section" class="content-section">
+                <div class="mood-container">
+                    <div class="mood-header">
+                        <h2>Mood Tracker</h2>
+                        <p>Track your daily mood and see patterns over time</p>
+                    </div>
+                    
+                    <div class="mood-entry">
+                        <h3>How are you feeling today?</h3>
+                        <div class="mood-selector">
+                            <div class="mood-option" data-mood="1">
+                                <span class="mood-emoji">😢</span>
+                                <span class="mood-label">Very Low</span>
+                            </div>
+                            <div class="mood-option" data-mood="2">
+                                <span class="mood-emoji">😔</span>
+                                <span class="mood-label">Low</span>
+                            </div>
+                            <div class="mood-option" data-mood="3">
+                                <span class="mood-emoji">😐</span>
+                                <span class="mood-label">Neutral</span>
+                            </div>
+                            <div class="mood-option" data-mood="4">
+                                <span class="mood-emoji">🙂</span>
+                                <span class="mood-label">Good</span>
+                            </div>
+                            <div class="mood-option" data-mood="5">
+                                <span class="mood-emoji">😊</span>
+                                <span class="mood-label">Great</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mood-notes">
+                            <label for="mood-notes">Optional notes:</label>
+                            <textarea id="mood-notes" placeholder="What's contributing to your mood today?"></textarea>
+                        </div>
+                        
+                        <button id="save-mood" class="save-mood-btn">Save Mood</button>
+                    </div>
+                    
+                    <div class="mood-history">
+                        <h3>Your Mood History</h3>
+                        <div class="mood-chart-container">
+                            <canvas id="mood-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="mood-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Average Mood</span>
+                                <span class="stat-value" id="avg-mood">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Best Day</span>
+                                <span class="stat-value" id="best-mood">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Days Tracked</span>
+                                <span class="stat-value" id="days-tracked">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Check-in Section -->
+            <section id="checkin-section" class="content-section">
+                <div class="checkin-container">
+                    <div class="checkin-header">
+                        <h2>Daily Check-in</h2>
+                        <p>Reflect on your day and set intentions for tomorrow</p>
+                    </div>
+                    
+                    <div class="checkin-form">
+                        <div class="checkin-question">
+                            <h3>How was your day overall?</h3>
+                            <div class="rating-scale">
+                                <input type="radio" id="day-1" name="day-rating" value="1">
+                                <label for="day-1">1</label>
+                                <input type="radio" id="day-2" name="day-rating" value="2">
+                                <label for="day-2">2</label>
+                                <input type="radio" id="day-3" name="day-rating" value="3">
+                                <label for="day-3">3</label>
+                                <input type="radio" id="day-4" name="day-rating" value="4">
+                                <label for="day-4">4</label>
+                                <input type="radio" id="day-5" name="day-rating" value="5">
+                                <label for="day-5">5</label>
+                            </div>
+                        </div>
+                        
+                        <div class="checkin-question">
+                            <h3>What went well today?</h3>
+                            <textarea id="positive-things" placeholder="List the good things that happened..."></textarea>
+                        </div>
+                        
+                        <div class="checkin-question">
+                            <h3>What challenges did you face?</h3>
+                            <textarea id="challenges" placeholder="Describe any difficulties you encountered..."></textarea>
+                        </div>
+                        
+                        <div class="checkin-question">
+                            <h3>What are you grateful for today?</h3>
+                            <textarea id="gratitude" placeholder="What are you thankful for?"></textarea>
+                        </div>
+                        
+                        <div class="checkin-question">
+                            <h3>What's one thing you want to focus on tomorrow?</h3>
+                            <textarea id="tomorrow-focus" placeholder="Set an intention for tomorrow..."></textarea>
+                        </div>
+                        
+                        <button id="submit-checkin" class="submit-checkin-btn">Complete Check-in</button>
+                    </div>
+                    
+                    <div class="checkin-history">
+                        <h3>Recent Check-ins</h3>
+                        <div id="checkin-list" class="checkin-list">
+                            <!-- Check-in history will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resources Section -->
+            <section id="resources-section" class="content-section">
+                <div class="resources-container">
+                    <div class="resources-header">
+                        <h2>Mental Health Resources</h2>
+                        <p>Tools and techniques to support your mental wellness</p>
+                    </div>
+                    
+                    <div class="resources-grid">
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>CBT Techniques</h3>
+                            <p>Learn cognitive behavioral therapy techniques to manage thoughts and emotions</p>
+                            <button class="resource-btn" data-resource="cbt">Explore</button>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-lungs"></i>
+                            </div>
+                            <h3>Breathing Exercises</h3>
+                            <p>Guided breathing techniques for stress relief and relaxation</p>
+                            <button class="resource-btn" data-resource="breathing">Start Exercise</button>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <h3>Mindfulness</h3>
+                            <p>Mindfulness practices for present-moment awareness</p>
+                            <button class="resource-btn" data-resource="mindfulness">Practice</button>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <h3>Behavioral Activation</h3>
+                            <p>Activities and exercises to improve mood and energy</p>
+                            <button class="resource-btn" data-resource="behavioral">Get Started</button>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <h3>Crisis Resources</h3>
+                            <p>Emergency contacts and crisis support information</p>
+                            <button class="resource-btn" data-resource="crisis">View Resources</button>
+                        </div>
+                        
+                        <div class="resource-card">
+                            <div class="resource-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h3>Self-Help Articles</h3>
+                            <p>Educational content about mental health and wellness</p>
+                            <button class="resource-btn" data-resource="articles">Read More</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section">
+                <div class="settings-container">
+                    <div class="settings-header">
+                        <h2>Settings</h2>
+                        <p>Customize your experience</p>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <div class="setting-group">
+                            <h3>Appearance</h3>
+                            <div class="setting-item">
+                                <label for="theme-toggle">Dark Mode</label>
+                                <div class="theme-toggle">
+                                    <input type="checkbox" id="theme-toggle" class="theme-checkbox">
+                                    <label for="theme-toggle" class="theme-slider">
+                                        <span class="theme-slider-button"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <h3>Notifications</h3>
+                            <div class="setting-item">
+                                <label for="daily-reminders">Daily check-in reminders</label>
+                                <input type="checkbox" id="daily-reminders" checked>
+                            </div>
+                            <div class="setting-item">
+                                <label for="mood-reminders">Mood tracking reminders</label>
+                                <input type="checkbox" id="mood-reminders" checked>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <h3>Data Management</h3>
+                            <div class="setting-item">
+                                <button id="export-data" class="data-btn">Export My Data</button>
+                                <button id="import-data" class="data-btn">Import Data</button>
+                                <input type="file" id="import-file" accept=".json" style="display: none;">
+                            </div>
+                            <div class="setting-item">
+                                <button id="clear-data" class="data-btn danger">Clear All Data</button>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <h3>About</h3>
+                            <div class="about-info">
+                                <p>Mental Health Chatbot v1.0</p>
+                                <p>Built with care for your mental wellness</p>
+                                <p><strong>Note:</strong> This is a prototype. For professional mental health support, please consult with a qualified therapist or counselor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+    </div>
+
+    <!-- Resource Modal -->
+    <div id="resource-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Resource</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Resource content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data-manager.js"></script>
+    <script src="chatbot.js"></script>
+    <script src="mood-tracker.js"></script>
+    <script src="app.js"></script>
+    
+</body>
+</html>
