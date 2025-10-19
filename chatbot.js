@@ -5,16 +5,52 @@
 
 class MentalHealthChatbot {
     constructor() {
+        this.currentLanguage = 'en';
         this.responses = this.initializeResponses();
         this.cbtTechniques = this.initializeCBTTechniques();
         this.breathingExercises = this.initializeBreathingExercises();
         this.mindfulnessTechniques = this.initializeMindfulnessTechniques();
         this.crisisResources = this.initializeCrisisResources();
+        this.translations = this.initializeTranslations();
         this.conversationContext = {
             lastMood: null,
             recentTopics: [],
             userNeeds: []
         };
+    }
+
+    /**
+     * Set the chatbot language
+     */
+    setLanguage(languageCode) {
+        this.currentLanguage = languageCode;
+    }
+
+    /**
+     * Get translated text for current language
+     */
+    getTranslation(key) {
+        const keys = key.split('.');
+        let translation = this.translations[this.currentLanguage];
+        
+        for (const k of keys) {
+            if (translation && translation[k]) {
+                translation = translation[k];
+            } else {
+                // Fallback to English if translation not found
+                translation = this.translations.en;
+                for (const fallbackKey of keys) {
+                    if (translation && translation[fallbackKey]) {
+                        translation = translation[fallbackKey];
+                    } else {
+                        return key; // Return key if no translation found
+                    }
+                }
+                break;
+            }
+        }
+        
+        return translation;
     }
 
     /**
@@ -132,12 +168,7 @@ class MentalHealthChatbot {
      * Intent-specific response handlers
      */
     handleGreeting() {
-        const greetings = [
-            "Hello! I'm so glad you're here. How are you feeling today?",
-            "Hi there! I'm your mental health companion. What's on your mind?",
-            "Welcome! I'm here to listen and support you. How can I help today?",
-            "Hello! It's great to see you. How are you doing right now?"
-        ];
+        const greetings = this.getTranslation('greetings');
         
         return {
             text: greetings[Math.floor(Math.random() * greetings.length)],
@@ -147,20 +178,9 @@ class MentalHealthChatbot {
 
     handleMoodSharing(message) {
         const moodResponses = {
-            positive: [
-                "That's wonderful to hear! I'm so glad you're feeling good. What's contributing to this positive mood?",
-                "It makes me happy to know you're feeling well! Can you tell me more about what's going well for you?",
-                "That's fantastic! Positive moments like these are so important. What helped you feel this way?"
-            ],
-            negative: [
-                "I'm sorry you're feeling this way. Your feelings are completely valid. Can you tell me more about what's going on?",
-                "I hear that you're struggling right now. That must be really difficult. I'm here to listen and support you.",
-                "Thank you for sharing how you're feeling. It takes courage to be open about difficult emotions. What's been weighing on you?"
-            ],
-            neutral: [
-                "I understand you're feeling neutral right now. Sometimes that's exactly what we need. How has your day been overall?",
-                "Neutral feelings are completely normal. Sometimes we need to just be where we are. What's been on your mind lately?"
-            ]
+            positive: this.getTranslation('mood_positive'),
+            negative: this.getTranslation('mood_negative'),
+            neutral: this.getTranslation('mood_neutral')
         };
 
         let responseType = 'neutral';
@@ -354,12 +374,7 @@ class MentalHealthChatbot {
     }
 
     handleGeneralResponse(message) {
-        const generalResponses = [
-            "I'm here to listen and support you. Can you tell me more about what's on your mind?",
-            "Thank you for sharing with me. I want to understand better—what's been challenging for you lately?",
-            "I'm listening. Sometimes it helps to talk through what we're experiencing. What's been weighing on you?",
-            "I'm here for you. What would be most helpful for you right now?"
-        ];
+        const generalResponses = this.getTranslation('general');
 
         return {
             text: generalResponses[Math.floor(Math.random() * generalResponses.length)],
@@ -521,6 +536,126 @@ class MentalHealthChatbot {
      */
     getMindfulnessTechnique() {
         return this.mindfulnessTechniques[Math.floor(Math.random() * this.mindfulnessTechniques.length)];
+    }
+
+    /**
+     * Initialize translations for chatbot responses
+     */
+    initializeTranslations() {
+        return {
+            en: {
+                greetings: [
+                    "Hello! I'm so glad you're here. How are you feeling today?",
+                    "Hi there! I'm your mental health companion. What's on your mind?",
+                    "Welcome! I'm here to listen and support you. How can I help today?",
+                    "Hello! It's great to see you. How are you doing right now?"
+                ],
+                mood_positive: [
+                    "That's wonderful to hear! I'm so glad you're feeling good. What's contributing to this positive mood?",
+                    "It makes me happy to know you're feeling well! Can you tell me more about what's going well for you?",
+                    "That's fantastic! Positive moments like these are so important. What helped you feel this way?"
+                ],
+                mood_negative: [
+                    "I'm sorry you're feeling this way. Your feelings are completely valid. Can you tell me more about what's going on?",
+                    "I hear that you're struggling right now. That must be really difficult. I'm here to listen and support you.",
+                    "Thank you for sharing how you're feeling. It takes courage to be open about difficult emotions. What's been weighing on you?"
+                ],
+                mood_neutral: [
+                    "I understand you're feeling neutral right now. Sometimes that's exactly what we need. How has your day been overall?",
+                    "Neutral feelings are completely normal. Sometimes we need to just be where we are. What's been on your mind lately?"
+                ],
+                general: [
+                    "I'm here to listen and support you. Can you tell me more about what's on your mind?",
+                    "Thank you for sharing with me. I want to understand better—what's been challenging for you lately?",
+                    "I'm listening. Sometimes it helps to talk through what we're experiencing. What's been weighing on you?",
+                    "I'm here for you. What would be most helpful for you right now?"
+                ]
+            },
+            hi: {
+                greetings: [
+                    "नमस्ते! मुझे खुशी है कि आप यहाँ हैं। आज आप कैसा महसूस कर रहे हैं?",
+                    "हैलो! मैं आपका मानसिक स्वास्थ्य साथी हूँ। आपके मन में क्या है?",
+                    "स्वागत है! मैं यहाँ आपकी सुनने और सहायता करने के लिए हूँ। आज मैं कैसे मदद कर सकता हूँ?",
+                    "नमस्ते! आपको देखकर बहुत अच्छा लगा। अभी आप कैसे हैं?"
+                ],
+                mood_positive: [
+                    "यह सुनकर बहुत अच्छा लगा! मुझे खुशी है कि आप अच्छा महसूस कर रहे हैं। इस सकारात्मक मूड में क्या योगदान दे रहा है?",
+                    "यह जानकर खुशी हुई कि आप अच्छा महसूस कर रहे हैं! क्या आप मुझे बता सकते हैं कि आपके लिए क्या अच्छा चल रहा है?",
+                    "यह शानदार है! ऐसे सकारात्मक पल बहुत महत्वपूर्ण हैं। आपको ऐसा महसूस कराने में क्या मदद की?"
+                ],
+                mood_negative: [
+                    "मुझे खेद है कि आप ऐसा महसूस कर रहे हैं। आपकी भावनाएं पूरी तरह वैध हैं। क्या आप मुझे बता सकते हैं कि क्या चल रहा है?",
+                    "मैं सुन रहा हूँ कि आप अभी संघर्ष कर रहे हैं। यह वास्तव में मुश्किल होना चाहिए। मैं यहाँ आपकी सुनने और सहायता करने के लिए हूँ।",
+                    "आपकी भावनाओं को साझा करने के लिए धन्यवाद। कठिन भावनाओं के बारे में खुलकर बात करने में साहस लगता है। आप पर क्या भारी पड़ रहा है?"
+                ],
+                mood_neutral: [
+                    "मैं समझता हूँ कि आप अभी तटस्थ महसूस कर रहे हैं। कभी-कभी यही वह चीज़ होती है जिसकी हमें जरूरत होती है। आपका दिन कैसा रहा है?",
+                    "तटस्थ भावनाएं पूरी तरह सामान्य हैं। कभी-कभी हमें बस वहीं रहना चाहिए जहाँ हम हैं। हाल ही में आपके मन में क्या रहा है?"
+                ],
+                general: [
+                    "मैं यहाँ आपकी सुनने और सहायता करने के लिए हूँ। क्या आप मुझे बता सकते हैं कि आपके मन में क्या है?",
+                    "मेरे साथ साझा करने के लिए धन्यवाद। मैं बेहतर समझना चाहता हूँ—हाल ही में आपके लिए क्या चुनौतीपूर्ण रहा है?",
+                    "मैं सुन रहा हूँ। कभी-कभी जो हम अनुभव कर रहे हैं उसके बारे में बात करना मदद करता है। आप पर क्या भारी पड़ रहा है?",
+                    "मैं आपके लिए यहाँ हूँ। अभी आपके लिए क्या सबसे मददगार होगा?"
+                ]
+            },
+            mr: {
+                greetings: [
+                    "नमस्कार! मला आनंद आहे की तुम्ही इथे आहात. आज तुम्हाला कसे वाटत आहे?",
+                    "हॅलो! मी तुमचा मानसिक आरोग्य साथी आहे. तुमच्या मनात काय आहे?",
+                    "स्वागत! मी तुमचे ऐकणे आणि मदत करण्यासाठी इथे आहे. आज मी कशी मदत करू शकतो?",
+                    "नमस्कार! तुम्हाला बघून खूप छान वाटले. आत्ता तुम्ही कसे आहात?"
+                ],
+                mood_positive: [
+                    "हे ऐकून खूप छान वाटले! मला आनंद आहे की तुम्ही चांगले वाटत आहात. या सकारात्मक मूडमध्ये काय योगदान देत आहे?",
+                    "तुम्ही चांगले वाटत आहात हे जाणून आनंद झाला! तुम्ही मला सांगू शकता की तुमच्यासाठी काय चांगले चालत आहे?",
+                    "हे अप्रतिम आहे! अशे सकारात्मक क्षण खूप महत्वाचे आहेत. तुम्हाला असे वाटण्यात काय मदत केली?"
+                ],
+                mood_negative: [
+                    "मला वाईट वाटत आहे की तुम्हाला असे वाटत आहे. तुमच्या भावना पूर्णपणे वैध आहेत. तुम्ही मला सांगू शकता की काय चालत आहे?",
+                    "मी ऐकत आहे की तुम्ही आत्ता संघर्ष करत आहात. हे खरोखर कठीण असावे. मी तुमचे ऐकणे आणि मदत करण्यासाठी इथे आहे.",
+                    "तुमच्या भावना सामायिक केल्याबद्दल धन्यवाद. कठीण भावनांबद्दल उघडपणे बोलण्यासाठी धैर्य लागते. तुमच्यावर काय भारी पडत आहे?"
+                ],
+                mood_neutral: [
+                    "मी समजतो की तुम्ही आत्ता तटस्थ वाटत आहात. कधीकधी हेच आवश्यक असते. तुमचा दिवस कसा गेला?",
+                    "तटस्थ भावना पूर्णपणे सामान्य आहेत. कधीकधी आपल्याला फक्त जिथे आहात तिथेच रहावे लागते. अलीकडे तुमच्या मनात काय आहे?"
+                ],
+                general: [
+                    "मी तुमचे ऐकणे आणि मदत करण्यासाठी इथे आहे. तुम्ही मला सांगू शकता की तुमच्या मनात काय आहे?",
+                    "माझ्याशी सामायिक केल्याबद्दल धन्यवाद. मला चांगले समजायचे आहे—अलीकडे तुमच्यासाठी काय आव्हानात्मक राहिले आहे?",
+                    "मी ऐकत आहे. कधीकधी आपण जे अनुभवत आहोत त्याबद्दल बोलणे मदत करते. तुमच्यावर काय भारी पडत आहे?",
+                    "मी तुमच्यासाठी इथे आहे. आत्ता तुमच्यासाठी काय सर्वात उपयुक्त असेल?"
+                ]
+            },
+            kn: {
+                greetings: [
+                    "ನಮಸ್ಕಾರ! ನೀವು ಇಲ್ಲಿದ್ದೀರಿ ಎಂದು ನನಗೆ ಸಂತೋಷವಾಗಿದೆ. ಇಂದು ನಿಮಗೆ ಹೇಗೆ ಅನಿಸುತ್ತಿದೆ?",
+                    "ಹಲೋ! ನಾನು ನಿಮ್ಮ ಮಾನಸಿಕ ಆರೋಗ್ಯ ಸಹಚರ. ನಿಮ್ಮ ಮನಸ್ಸಿನಲ್ಲಿ ಏನಿದೆ?",
+                    "ಸ್ವಾಗತ! ನಿಮ್ಮನ್ನು ಕೇಳಲು ಮತ್ತು ಬೆಂಬಲಿಸಲು ನಾನು ಇಲ್ಲಿದ್ದೇನೆ. ಇಂದು ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+                    "ನಮಸ್ಕಾರ! ನಿಮ್ಮನ್ನು ನೋಡಿ ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ. ಇದೀಗ ನೀವು ಹೇಗಿದ್ದೀರಿ?"
+                ],
+                mood_positive: [
+                    "ಇದನ್ನು ಕೇಳಿ ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ! ನೀವು ಚೆನ್ನಾಗಿ ಅನಿಸುತ್ತಿದ್ದೀರಿ ಎಂದು ನನಗೆ ಸಂತೋಷವಾಗಿದೆ. ಈ ಧನಾತ್ಮಕ ಮನಸ್ಥಿತಿಗೆ ಏನು ಕೊಡುಗೆ ನೀಡುತ್ತಿದೆ?",
+                    "ನೀವು ಚೆನ್ನಾಗಿ ಅನಿಸುತ್ತಿದ್ದೀರಿ ಎಂದು ತಿಳಿದು ಸಂತೋಷವಾಗಿದೆ! ನಿಮಗೆ ಏನು ಚೆನ್ನಾಗಿ ನಡೆಯುತ್ತಿದೆ ಎಂಬುದನ್ನು ನೀವು ನನಗೆ ಹೆಚ್ಚು ಹೇಳಬಹುದೇ?",
+                    "ಇದು ಅದ್ಭುತವಾಗಿದೆ! ಇಂತಹ ಧನಾತ್ಮಕ ಕ್ಷಣಗಳು ತುಂಬಾ ಮುಖ್ಯವಾಗಿವೆ. ನಿಮಗೆ ಈ ರೀತಿ ಅನಿಸುವುದಕ್ಕೆ ಏನು ಸಹಾಯ ಮಾಡಿತು?"
+                ],
+                mood_negative: [
+                    "ನೀವು ಈ ರೀತಿ ಅನಿಸುತ್ತಿದ್ದೀರಿ ಎಂದು ನನಗೆ ವಿಷಾದವಾಗಿದೆ. ನಿಮ್ಮ ಭಾವನೆಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಮಾನ್ಯವಾಗಿವೆ. ಏನು ನಡೆಯುತ್ತಿದೆ ಎಂಬುದನ್ನು ನೀವು ನನಗೆ ಹೆಚ್ಚು ಹೇಳಬಹುದೇ?",
+                    "ನೀವು ಇದೀಗ ಹೋರಾಟ ನಡೆಸುತ್ತಿದ್ದೀರಿ ಎಂದು ನಾನು ಕೇಳುತ್ತಿದ್ದೇನೆ. ಇದು ನಿಜವಾಗಿಯೂ ಕಷ್ಟವಾಗಿರಬೇಕು. ನಿಮ್ಮನ್ನು ಕೇಳಲು ಮತ್ತು ಬೆಂಬಲಿಸಲು ನಾನು ಇಲ್ಲಿದ್ದೇನೆ.",
+                    "ನಿಮ್ಮ ಭಾವನೆಗಳನ್ನು ಹಂಚಿಕೊಂಡಿದ್ದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು. ಕಷ್ಟಕರ ಭಾವನೆಗಳ ಬಗ್ಗೆ ತೆರೆದುಕೊಂಡು ಮಾತನಾಡಲು ಧೈರ್ಯ ಬೇಕು. ನಿಮ್ಮ ಮೇಲೆ ಏನು ಭಾರವಾಗಿದೆ?"
+                ],
+                mood_neutral: [
+                    "ನೀವು ಇದೀಗ ತಟಸ್ಥವಾಗಿ ಅನಿಸುತ್ತಿದ್ದೀರಿ ಎಂದು ನಾನು ಅರ್ಥಮಾಡಿಕೊಂಡಿದ್ದೇನೆ. ಕೆಲವೊಮ್ಮೆ ಇದು ನಮಗೆ ಬೇಕಾದುದೇ. ನಿಮ್ಮ ದಿನ ಹೇಗಿತ್ತು?",
+                    "ತಟಸ್ಥ ಭಾವನೆಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಸಾಮಾನ್ಯವಾಗಿವೆ. ಕೆಲವೊಮ್ಮೆ ನಾವು ಇರುವಲ್ಲೇ ಇರಬೇಕು. ಇತ್ತೀಚೆಗೆ ನಿಮ್ಮ ಮನಸ್ಸಿನಲ್ಲಿ ಏನಿದೆ?"
+                ],
+                general: [
+                    "ನಿಮ್ಮನ್ನು ಕೇಳಲು ಮತ್ತು ಬೆಂಬಲಿಸಲು ನಾನು ಇಲ್ಲಿದ್ದೇನೆ. ನಿಮ್ಮ ಮನಸ್ಸಿನಲ್ಲಿ ಏನಿದೆ ಎಂಬುದನ್ನು ನೀವು ನನಗೆ ಹೆಚ್ಚು ಹೇಳಬಹುದೇ?",
+                    "ನನ್ನೊಂದಿಗೆ ಹಂಚಿಕೊಂಡಿದ್ದಕ್ಕಾಗಿ ಧನ್ಯವಾದಗಳು. ನಾನು ಚೆನ್ನಾಗಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಬಯಸುತ್ತೇನೆ—ಇತ್ತೀಚೆಗೆ ನಿಮಗೆ ಏನು ಸವಾಲಾಗಿದೆ?",
+                    "ನಾನು ಕೇಳುತ್ತಿದ್ದೇನೆ. ಕೆಲವೊಮ್ಮೆ ನಾವು ಅನುಭವಿಸುತ್ತಿರುವುದರ ಬಗ್ಗೆ ಮಾತನಾಡುವುದು ಸಹಾಯಕವಾಗುತ್ತದೆ. ನಿಮ್ಮ ಮೇಲೆ ಏನು ಭಾರವಾಗಿದೆ?",
+                    "ನಾನು ನಿಮಗಾಗಿ ಇಲ್ಲಿದ್ದೇನೆ. ಇದೀಗ ನಿಮಗೆ ಏನು ಹೆಚ್ಚು ಸಹಾಯಕವಾಗುತ್ತದೆ?"
+                ]
+            }
+        };
     }
 }
 

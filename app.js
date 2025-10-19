@@ -6,6 +6,7 @@
 class MentalHealthApp {
     constructor() {
         this.currentSection = 'chat';
+        this.currentLanguage = 'en';
         this.chatInterface = null;
         this.moodTracker = null;
         this.checkInSystem = null;
@@ -20,6 +21,7 @@ class MentalHealthApp {
     initializeApp() {
         this.setupNavigation();
         this.initializeMobileMenu();
+        this.initializeLanguageSystem();
         this.initializeChatInterface();
         this.initializeCheckInSystem();
         this.initializeResourceModal();
@@ -113,6 +115,254 @@ class MentalHealthApp {
         if (mobileMenuToggle) {
             mobileMenuToggle.style.display = 'flex';
         }
+    }
+
+    /**
+     * Initialize language system
+     */
+    initializeLanguageSystem() {
+        this.translations = this.initializeTranslations();
+        this.setupLanguageSwitcher();
+        this.loadSavedLanguage();
+    }
+
+    /**
+     * Setup language switcher event listener
+     */
+    setupLanguageSwitcher() {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                this.changeLanguage(e.target.value);
+            });
+        }
+    }
+
+    /**
+     * Load saved language preference
+     */
+    loadSavedLanguage() {
+        const savedLanguage = localStorage.getItem('app-language') || 'en';
+        this.changeLanguage(savedLanguage);
+    }
+
+    /**
+     * Change application language
+     */
+    changeLanguage(languageCode) {
+        this.currentLanguage = languageCode;
+        localStorage.setItem('app-language', languageCode);
+        
+        // Update language selector
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.value = languageCode;
+        }
+        
+        // Update all UI elements
+        this.updateUIForLanguage();
+        
+        // Update chatbot language
+        if (window.chatbot) {
+            window.chatbot.setLanguage(languageCode);
+        }
+    }
+
+    /**
+     * Update UI elements for current language
+     */
+    updateUIForLanguage() {
+        const currentLang = this.translations[this.currentLanguage];
+        
+        // Update navigation items
+        this.updateElementText('[data-section="chat"] span', currentLang.nav.chat);
+        this.updateElementText('[data-section="mood"] span', currentLang.nav.mood);
+        this.updateElementText('[data-section="checkin"] span', currentLang.nav.checkin);
+        this.updateElementText('[data-section="resources"] span', currentLang.nav.resources);
+        this.updateElementText('[data-section="settings"] span', currentLang.nav.settings);
+        
+        // Update chat section
+        this.updateElementText('#chat-section .chat-header h2', currentLang.chat.title);
+        this.updateElementText('#chat-section .chat-header p', currentLang.chat.subtitle);
+        this.updateElementText('#chat-input', currentLang.chat.placeholder);
+        
+        // Update mood tracker
+        this.updateElementText('#mood-section .mood-header h2', currentLang.mood.title);
+        this.updateElementText('#mood-section .mood-header p', currentLang.mood.subtitle);
+        this.updateElementText('#mood-section .mood-entry h3', currentLang.mood.question);
+        this.updateElementText('#mood-notes label', currentLang.mood.notesLabel);
+        this.updateElementText('#mood-notes', currentLang.mood.notesPlaceholder);
+        this.updateElementText('#save-mood', currentLang.mood.saveButton);
+        
+        // Update check-in section
+        this.updateElementText('#checkin-section .checkin-header h2', currentLang.checkin.title);
+        this.updateElementText('#checkin-section .checkin-header p', currentLang.checkin.subtitle);
+        
+        // Update resources section
+        this.updateElementText('#resources-section .resources-header h2', currentLang.resources.title);
+        this.updateElementText('#resources-section .resources-header p', currentLang.resources.subtitle);
+        
+        // Update settings section
+        this.updateElementText('#settings-section .settings-header h2', currentLang.settings.title);
+        this.updateElementText('#settings-section .settings-header p', currentLang.settings.subtitle);
+    }
+
+    /**
+     * Helper method to update element text
+     */
+    updateElementText(selector, text) {
+        const element = document.querySelector(selector);
+        if (element) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = text;
+            } else {
+                element.textContent = text;
+            }
+        }
+    }
+
+    /**
+     * Initialize translations for all supported languages
+     */
+    initializeTranslations() {
+        return {
+            en: {
+                nav: {
+                    chat: "Local Chat",
+                    mood: "Mood Tracker",
+                    checkin: "Daily Check-in",
+                    resources: "Resources",
+                    settings: "Settings"
+                },
+                chat: {
+                    title: "Local Wellness Chat",
+                    subtitle: "Simple pattern-matching mental health support",
+                    placeholder: "Type your message here..."
+                },
+                mood: {
+                    title: "Mood Tracker",
+                    subtitle: "Track your daily mood and see patterns over time",
+                    question: "How are you feeling today?",
+                    notesLabel: "Optional notes:",
+                    notesPlaceholder: "What's contributing to your mood today?",
+                    saveButton: "Save Mood"
+                },
+                checkin: {
+                    title: "Daily Check-in",
+                    subtitle: "Reflect on your day and set intentions for tomorrow"
+                },
+                resources: {
+                    title: "Mental Health Resources",
+                    subtitle: "Tools and techniques to support your mental wellness"
+                },
+                settings: {
+                    title: "Settings",
+                    subtitle: "Customize your experience"
+                }
+            },
+            hi: {
+                nav: {
+                    chat: "स्थानीय चैट",
+                    mood: "मूड ट्रैकर",
+                    checkin: "दैनिक जांच",
+                    resources: "संसाधन",
+                    settings: "सेटिंग्स"
+                },
+                chat: {
+                    title: "स्थानीय कल्याण चैट",
+                    subtitle: "सरल पैटर्न-मैचिंग मानसिक स्वास्थ्य सहायता",
+                    placeholder: "अपना संदेश यहाँ टाइप करें..."
+                },
+                mood: {
+                    title: "मूड ट्रैकर",
+                    subtitle: "अपने दैनिक मूड को ट्रैक करें और समय के साथ पैटर्न देखें",
+                    question: "आज आप कैसा महसूस कर रहे हैं?",
+                    notesLabel: "वैकल्पिक नोट्स:",
+                    notesPlaceholder: "आज आपके मूड में क्या योगदान दे रहा है?",
+                    saveButton: "मूड सेव करें"
+                },
+                checkin: {
+                    title: "दैनिक जांच",
+                    subtitle: "अपने दिन पर विचार करें और कल के लिए इरादे निर्धारित करें"
+                },
+                resources: {
+                    title: "मानसिक स्वास्थ्य संसाधन",
+                    subtitle: "आपके मानसिक कल्याण का समर्थन करने के लिए उपकरण और तकनीक"
+                },
+                settings: {
+                    title: "सेटिंग्स",
+                    subtitle: "अपना अनुभव अनुकूलित करें"
+                }
+            },
+            mr: {
+                nav: {
+                    chat: "स्थानिक चॅट",
+                    mood: "मूड ट्रॅकर",
+                    checkin: "दैनंदिन तपासणी",
+                    resources: "संसाधने",
+                    settings: "सेटिंग्ज"
+                },
+                chat: {
+                    title: "स्थानिक कल्याण चॅट",
+                    subtitle: "सोपी पॅटर्न-मॅचिंग मानसिक आरोग्य सहायता",
+                    placeholder: "आपला संदेश येथे टाइप करा..."
+                },
+                mood: {
+                    title: "मूड ट्रॅकर",
+                    subtitle: "आपल्या दैनंदिन मूडचा मागोवा घ्या आणि कालांतराने नमुने पहा",
+                    question: "आज तुम्हाला कसे वाटत आहे?",
+                    notesLabel: "पर्यायी नोट्स:",
+                    notesPlaceholder: "आज तुमच्या मूडमध्ये काय योगदान देत आहे?",
+                    saveButton: "मूड सेव्ह करा"
+                },
+                checkin: {
+                    title: "दैनंदिन तपासणी",
+                    subtitle: "आपल्या दिवसाचा विचार करा आणि उद्या साठी हेतू निर्धारित करा"
+                },
+                resources: {
+                    title: "मानसिक आरोग्य संसाधने",
+                    subtitle: "आपल्या मानसिक कल्याणासाठी साधने आणि तंत्रे"
+                },
+                settings: {
+                    title: "सेटिंग्ज",
+                    subtitle: "आपला अनुभव अनुकूलित करा"
+                }
+            },
+            kn: {
+                nav: {
+                    chat: "ಸ್ಥಳೀಯ ಚಾಟ್",
+                    mood: "ಮನಸ್ಥಿತಿ ಟ್ರ್ಯಾಕರ್",
+                    checkin: "ದೈನಂದಿನ ಪರಿಶೀಲನೆ",
+                    resources: "ಸಂಪನ್ಮೂಲಗಳು",
+                    settings: "ಸೆಟ್ಟಿಂಗ್ಗಳು"
+                },
+                chat: {
+                    title: "ಸ್ಥಳೀಯ ಕಲ್ಯಾಣ ಚಾಟ್",
+                    subtitle: "ಸರಳ ಪ್ಯಾಟರ್ನ್-ಮ್ಯಾಚಿಂಗ್ ಮಾನಸಿಕ ಆರೋಗ್ಯ ಬೆಂಬಲ",
+                    placeholder: "ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                },
+                mood: {
+                    title: "ಮನಸ್ಥಿತಿ ಟ್ರ್ಯಾಕರ್",
+                    subtitle: "ನಿಮ್ಮ ದೈನಂದಿನ ಮನಸ್ಥಿತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ ಮತ್ತು ಕಾಲಾನಂತರದಲ್ಲಿ ಮಾದರಿಗಳನ್ನು ನೋಡಿ",
+                    question: "ಇಂದು ನಿಮಗೆ ಹೇಗೆ ಅನಿಸುತ್ತಿದೆ?",
+                    notesLabel: "ಐಚ್ಛಿಕ ಟಿಪ್ಪಣಿಗಳು:",
+                    notesPlaceholder: "ಇಂದು ನಿಮ್ಮ ಮನಸ್ಥಿತಿಗೆ ಏನು ಕೊಡುಗೆ ನೀಡುತ್ತಿದೆ?",
+                    saveButton: "ಮನಸ್ಥಿತಿ ಉಳಿಸಿ"
+                },
+                checkin: {
+                    title: "ದೈನಂದಿನ ಪರಿಶೀಲನೆ",
+                    subtitle: "ನಿಮ್ಮ ದಿನದ ಬಗ್ಗೆ ಯೋಚಿಸಿ ಮತ್ತು ನಾಳೆಗಾಗಿ ಉದ್ದೇಶಗಳನ್ನು ಹೊಂದಿಸಿ"
+                },
+                resources: {
+                    title: "ಮಾನಸಿಕ ಆರೋಗ್ಯ ಸಂಪನ್ಮೂಲಗಳು",
+                    subtitle: "ನಿಮ್ಮ ಮಾನಸಿಕ ಕಲ್ಯಾಣವನ್ನು ಬೆಂಬಲಿಸಲು ಸಾಧನಗಳು ಮತ್ತು ತಂತ್ರಗಳು"
+                },
+                settings: {
+                    title: "ಸೆಟ್ಟಿಂಗ್ಗಳು",
+                    subtitle: "ನಿಮ್ಮ ಅನುಭವವನ್ನು ಹೊಂದಾಣಿಕೆ ಮಾಡಿ"
+                }
+            }
+        };
     }
 
     /**
@@ -553,6 +803,7 @@ class ChatInterface {
     initializeChatInterface() {
         this.setupChatInput();
         this.setupTypingIndicator();
+        this.setupNewChatButton();
     }
 
     setupChatInput() {
@@ -577,6 +828,70 @@ class ChatInterface {
 
     setupTypingIndicator() {
         this.typingIndicator = document.getElementById('typing-indicator');
+    }
+
+    setupNewChatButton() {
+        const newChatButton = document.getElementById('new-chat-button');
+        if (newChatButton) {
+            newChatButton.addEventListener('click', () => {
+                this.startNewChat();
+            });
+        }
+    }
+
+    startNewChat() {
+        // Clear the chat messages
+        this.clearChat();
+        
+        // Add a fresh welcome message
+        this.addBotMessage("Hello! I'm here to listen and support you. How can I help today?");
+        
+        // Show a brief confirmation
+        this.showNewChatConfirmation();
+    }
+
+    clearChat() {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+        }
+        
+        // Clear chat history from data manager
+        if (window.dataManager) {
+            window.dataManager.clearChatHistory();
+        }
+    }
+
+    showNewChatConfirmation() {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        notification.textContent = 'New chat started!';
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
     }
 
     async sendMessage() {

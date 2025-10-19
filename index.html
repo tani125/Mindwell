@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Botpress Webchat -->
+    <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js" defer></script>
+    <script src="https://files.bpcontent.cloud/2025/09/08/07/20250908073527-G4FZYJVA.js" defer></script>
+    
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -76,15 +80,6 @@
             </ul>
             
             <div class="sidebar-footer">
-                <div class="language-switcher">
-                    <label for="language-select">Language:</label>
-                    <select id="language-select" class="language-select">
-                        <option value="en">English</option>
-                        <option value="hi">हिन्दी (Hindi)</option>
-                        <option value="mr">मराठी (Marathi)</option>
-                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                    </select>
-                </div>
                 <div class="user-info">
                     <div class="streak-counter">
                         <i class="fas fa-fire"></i>
@@ -100,6 +95,10 @@
             <section id="chat-section" class="content-section active">
                 <div class="chat-container">
                     <div class="chat-header">
+                        <button class="new-chat-button" id="new-chat-button" title="Start New Chat">
+                            <i class="fas fa-plus"></i>
+                            New Chat
+                        </button>
                         <h2>Local Wellness Chat</h2>
                         <p>Simple pattern-matching mental health support</p>
                     </div>
